@@ -1,4 +1,6 @@
-### 👇🏻 Please visit my portfolio via the link below.
+https://github.com/Iuryppedrosa/learning-nodejs-by-practicing/assets/89420889/c82425f5-9b96-419f-aefe-7a67e1f65946
+### 👇🏻 Please visit my portfo
+lio via the link below.
 ![qr_img_code](https://github.com/Iuryppedrosa/learning-nodejs-by-practicing/assets/89420889/1b96f1b2-1f50-452e-8613-03b23ccf9000)
 
 ## Overview
