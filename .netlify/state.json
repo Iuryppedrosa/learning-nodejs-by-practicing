@@ -1,0 +1,20 @@
+{
+	"geolocation": {
+		"data": {
+			"city": "Uberlândia",
+			"country": {
+				"code": "BR",
+				"name": "Brazil"
+			},
+			"subdivision": {
+				"code": "MG",
+				"name": "Minas Gerais"
+			},
+			"timezone": "America/Sao_Paulo",
+			"latitude": -19.0243,
+			"longitude": -48.3428
+		},
+		"timestamp": 1717540884677
+	},
+	"siteId": "0a1c5690-5237-4674-8790-0396f1d01f24"
+}

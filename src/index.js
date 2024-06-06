@@ -5,12 +5,22 @@ import bodyParser from 'body-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import mongoose from 'mongoose';
+import FileModel from './service/models/FileModel.js';
+import stream from 'stream';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
 const port = 3000;
+
+mongoose.connect('mongodb+srv://admin:123@qr-codeapi.6oqcy44.mongodb.net/')
+    .then(() => {
+        console.log('Connected to MongoDB');
+    }).catch((err) => { 
+        console.log('Could not connect to MongoDB', err);
+    });
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -28,53 +38,58 @@ app.post('/generate', (req, res) => {
     }
 
     const qrCodeImage = qrImage(url);
+    const imageBuffer = qrCodeImage.pipe(new stream.PassThrough()).read();
     const filePath = path.join(__dirname, '../public/qr_img_code.png');
     const writeStream = fs.createWriteStream(filePath);
 
     qrCodeImage.pipe(writeStream)
         .on('finish', () => {
-            res.download(filePath, 'qr_img_code.png', (err) => {
+            fs.readFile(filePath, (err, imageBuffer) => {
                 if (err) {
-                    res.status(500).send('Could not download the image');
+                    console.log('Could not read the image', err);
+                    return res.status(500).send('Could not generate QR code');
                 }
-                fs.unlinkSync(filePath);
-            })
+                FileModel.create({
+                    link: url,
+                    image: {
+                        data: imageBuffer,
+                        contentType: 'image/png'
+                    }
+                })
+                .then(() => {
+                    res.download(filePath, 'qr_img_code.png', (err) => {
+                        if (err) {
+                            res.status(500).send('Could not download the image');
+                        }
+                        fs.unlinkSync(filePath);
+                    });
+                })
+                .catch((err) => {
+                    res.status(500).send('Could not save to database');
+                });
+            });
         })
         .on('error', () => {
             res.status(500).send('Could not generate QR code');
         });
 });
+    
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
-// inquirer
-//     .prompt([{
-//         name: 'url',
-//         message: 'Enter a URL to turn into a QR code:',
-//     }])
-//     .then(answers => {
-//         const userUrl = answers.url;
-//         const qrCode = qr.image(userUrl); // type is default to 'png'
-//         // const qrCode = qr.image(userUrl, { type: 'png' });
-//         qrCode.pipe(fs.createWriteStream('qr_img_code.png'));
-//         fs.writeFile('qr_code_url.txt', userUrl, (err) => {
-//             if (err) {
-//                 console.log(err);
-//             }
-//             else {
-//                 console.log('QR code image and URL saved successfully!');
-//             }
-//         });
-//     })
-//     .catch(err => {
-//         if (err) {
-//             console.log(err.isTtyError);
-//         }
-//         else {
-// //             console.log('Something went wrong!');
-// //         }
-// });
+    // qrCodeImage.pipe(writeStream)
+    //     .on('finish', () => {
+    //         res.download(filePath, 'qr_img_code.png', (err) => {
+    //             if (err) {
+    //                 res.status(500).send('Could not download the image');
+    //             }
+    //             fs.unlinkSync(filePath);
+    //         })
+    //     })
+    //     .on('error', () => {
+    //         res.status(500).send('Could not generate QR code');
+    //     });
 
 
