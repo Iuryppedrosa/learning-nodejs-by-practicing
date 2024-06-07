@@ -15,7 +15,7 @@ const __dirname = dirname(__filename);
 const app = express();
 const port = 3000;
 
-mongoose.connect('mongodb+srv://admin:123@qr-codeapi.6oqcy44.mongodb.net/')
+mongoose.connect('')
     .then(() => {
         console.log('Connected to MongoDB');
     }).catch((err) => { 
